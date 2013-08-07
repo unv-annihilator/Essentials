@@ -47,6 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import me.bibo38.ChgUsers.ChgUsers;
 import net.ess3.api.IItemDb;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -99,6 +100,8 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials
 	private transient EssentialsTimer timer;
 	private transient List<String> vanishedPlayers = new ArrayList<String>();
 	private transient SimpleCommandMap scm;
+	private transient List<String> players = new ArrayList<String>();
+	private static Essentials instance;
 
 	@Override
 	public ISettings getSettings()
@@ -147,6 +150,15 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials
 			{
 				LOGGER.log(Level.WARNING, _("versionMismatch", plugin.getDescription().getName()));
 			}
+		}
+		Plugin chg = pm.getPlugin("ChgUsers");
+		if(chg != null && chg instanceof ChgUsers) {
+			players = (List<String>)((ChgUsers)chg).getConfig().getList("fake-player");
+			List<String> temp = new ArrayList<String>();
+			for(String player : players) {
+				temp.add(player.toLowerCase());
+			}
+			players = temp;
 		}
 		final Matcher versionMatch = Pattern.compile("git-Bukkit-(?:(?:[0-9]+)\\.)+[0-9]+-R[\\.0-9]+-(?:[0-9]+-g[0-9a-f]+-)?b([0-9]+)jnks.*").matcher(getServer().getVersion());
 		if (versionMatch.matches())
@@ -248,6 +260,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials
 		{
 			LOGGER.log(Level.INFO, "Essentials load " + timeroutput);
 		}
+		instance = this;
 	}
 
 	@Override
@@ -498,6 +511,14 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials
 		}
 	}
 
+	public List<String> getFakePlayers() {
+		return players;
+	}
+	
+	public static Essentials getInstance() {
+		return instance;
+	}
+	
 	public void cleanupOpenInventories()
 	{
 		for (Player player : getServer().getOnlinePlayers())

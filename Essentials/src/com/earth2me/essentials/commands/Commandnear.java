@@ -1,7 +1,9 @@
 package com.earth2me.essentials.commands;
 
+import com.earth2me.essentials.Essentials;
 import static com.earth2me.essentials.I18n._;
 import com.earth2me.essentials.User;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -103,11 +105,12 @@ public class Commandnear extends EssentialsCommand
 		final StringBuilder output = new StringBuilder();
 		final long radiusSquared = radius * radius;
 		boolean showHidden = user.isAuthorized("essentials.vanish.interact");
-
+		List<String> players = Essentials.getInstance().getFakePlayers();
+		
 		for (Player onlinePlayer : server.getOnlinePlayers())
 		{
 			final User player = ess.getUser(onlinePlayer);
-			if (!player.equals(user) && (!player.isHidden() || showHidden))
+			if (!player.equals(user) && !players.contains(player.getName().toLowerCase()) && (!player.isHidden() || showHidden))
 			{
 				final Location playerLoc = player.getLocation();
 				if (playerLoc.getWorld() != world)
